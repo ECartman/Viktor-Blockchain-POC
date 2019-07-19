@@ -1,0 +1,162 @@
+/*
+ *
+ *   Copyright © 2019 Eduardo Vindas Cordoba. All rights reserved.
+ *
+ *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *   THE SOFTWARE.
+ *
+ */
+/**
+ * gradle build script. 
+ * this file is a groove script... 
+ * 
+ * IDE RANT (on regards of Gradle) 
+ *  NETBEANS: has lower the quality of the product since migrated to APACHE. gradle support is quite lacking. 
+ *  intelliJ  good, but some of the Shorcuts are not as good as Visual studio or Netbeans
+ *  great gradle support tho.  
+ *  eclipse slow... way too slow. but good. i quite like it. but the UI needs rework. 
+ *  visual studio code.... nice but gradle support and java. well require more work. 
+ *  also vs code java modules is just a copy paste code from eclipse. but lack configurations so if you get issues with it use 
+ *  eclipse and then import to vs.code.   
+ * 
+ */
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+description = 'Blockchain POC: Expediente digital'
+    group = ' POC'
+
+println("Blockchain PoC Gradle Builder")
+println("Copyright © 2019 Eduardo Vindas Cordoba. All rights reserved.")
+project.version=String.format("%s.%s.%s",project.projmajor,project.projminor,project.projrevision)
+println("Past build: "+project.projbuild)
+println("Past Version: "+project.version)
+
+task UpdateBuildNum {
+    doLast{
+        Properties props = new Properties()
+        File propsFile
+        try {
+            propsFile = new File('gradle.properties')
+            props.load(propsFile.newDataInputStream())
+        }catch(FileNotFoundException e){
+            println(project.projectDir.path+'\\gradle.properties')
+            propsFile = new File(project.projectDir.path+'\\gradle.properties')
+            props.load(propsFile.newDataInputStream())
+        }
+        project.projbuild=""+(Integer.parseInt(""+project.projbuild)+1)
+        props.setProperty('projbuild',project.projbuild)
+        project.projrevision = Integer.parseInt(""+project.projrevision)+1
+        project.version= String.format("%s.%s.%s",project.projmajor,project.projminor,project.projrevision)
+        props.setProperty('version',project.version)
+        props.setProperty('projrevision',""+project.projrevision)
+        props.store(propsFile.newWriter(), null)
+        println("current build: "+project.projbuild)
+        println("current Version: "+project.version)
+    }
+}
+
+
+classes.dependsOn UpdateBuildNum
+
+mainClassName = 'com.aeongames.blockchain.application'
+
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            /*add the flag to include the SmartCard Java module to read smartcards. as this is not loaded or provided as per 
+                default. 
+                Xlint is set to view Unchecked and Deprecation warnings. and fix them 
+            */
+            options.compilerArgs << "--add-modules=java.smartcardio" << "-Xlint:unchecked"
+        }
+    }
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDirs "src/main/resources", "src/main/configs"
+        }
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+        resources {
+            //pull configs from the non test. 
+            srcDirs "src/main/resources", "src/main/configs"
+        }
+    }
+}
+
+jar {
+    //do this in order to avoid resource to be added into the root of the jar. we want instead to add them into the 
+    // "resource" folder... why the F does Gradle does not allow oneself to choose this behaviour... 
+    // AM I getting old a grumpy about this tishi? 
+    //exclude('**.properties')
+    manifest { 
+       attributes 'Main-Class': 'com.aeongames.blockchain.application'
+       attributes 'Project-Version': project.version
+        attributes 'Implementation-Version': project.version
+    }
+    
+}
+
+repositories {
+    jcenter()
+}
+
+
+dependencies {
+    //**** crypto
+	implementation "org.bouncycastle:bcprov-jdk15on:1.61", "org.bouncycastle:bctls-jdk15on:1.61", "org.bouncycastle:bcpkix-jdk15on:1.61"
+    //**** Json
+    implementation 'com.google.code.gson:gson:2.8.5'
+    //UI
+    implementation 'org.pushing-pixels:radiance-neon:2.0.1'
+    implementation 'org.pushing-pixels:radiance-substance:2.0.1'
+    implementation 'org.pushing-pixels:radiance-photon:2.0.1'
+    implementation 'org.pushing-pixels:radiance-trident:2.0.1'
+    implementation 'org.pushing-pixels:radiance-flamingo:2.0.1'
+    implementation 'org.pushing-pixels:radiance-substance-extras:2.0.1'
+    implementation 'com.github.lgooddatepicker:LGoodDatePicker:10.3.1'
+    //get me the Fing documentation g dammit
+    //now i am confused tho. i set them as test imp as i dont want my final product to have sources... 
+    testImplementation 'org.pushing-pixels:radiance-neon:2.0.1:sources'
+    testImplementation 'org.pushing-pixels:radiance-substance:2.0.1:sources'
+    testImplementation 'org.pushing-pixels:radiance-photon:2.0.1:sources'
+    testImplementation 'org.pushing-pixels:radiance-trident:2.0.1:sources'
+    testImplementation 'org.pushing-pixels:radiance-flamingo:2.0.1:sources'
+    testImplementation 'org.pushing-pixels:radiance-substance-extras:2.0.1:sources'
+    testImplementation 'org.pushing-pixels:radiance-neon:2.0.1:javadoc'
+    testImplementation 'org.pushing-pixels:radiance-substance:2.0.1:javadoc'
+    testImplementation 'org.pushing-pixels:radiance-photon:2.0.1:javadoc'
+    testImplementation 'org.pushing-pixels:radiance-trident:2.0.1:javadoc'
+    testImplementation 'org.pushing-pixels:radiance-flamingo:2.0.1:javadoc'
+    testImplementation 'org.pushing-pixels:radiance-substance-extras:2.0.1:javadoc'
+    //end of ui
+
+    //-- redis lib
+// https://mvnrepository.com/artifact/redis.clients/jedis
+    implementation group: 'redis.clients', name: 'jedis', version: '3.1.0-m3'
+// https://mvnrepository.com/artifact/org.checkerframework/checker-qual
+    //**** null anotator 
+    implementation group: 'org.checkerframework', name: 'checker-qual', version: '2.8.2'
+    //**** testing engine. 
+    testImplementation 'junit:junit:4.12'
+}
+//TODO 
+//Create a more friendly distributable file 
+//https://github.com/Santulator/Santulator/blob/1.1.0/package/build.gradle

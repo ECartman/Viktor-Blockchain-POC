@@ -1,0 +1,45 @@
+List of TODOS or for future work after the POC:
+
+/***************************#1**************************/
+migrate the PBFT from 
+the current implementation to something faster or at the least something more compact. 
+also migrate the implementation as it is stands it requires REDIS for communications
+
+we instead propouse to use: 
+gRPC 
+or Clain and clasic Sockets 
+OR but not suggested HTTPS communications. <too verbose... > (convert data to strings) although the way we are working right now is the same.
+also we might need to merge the PBFT with PAXOS Agreement. to also support authorization. 
+https://www.youtube.com/watch?v=s8JqcZtvnsM
+https://people.cs.umass.edu/~emery/classes/cmpsci691st/scribe/lecture17-byz.pdf
+
+
+/***************************#1**************************/
+
+/***************************#2**************************/
+check for all @NotImplementedYet anotations.
+/***************************#2**************************/
+
+/***************************#3**************************/
+it should be more than obvious but there are a lot of documentation missing. 
+so add more javadocs. to clases and methods. 
+/***************************#3**************************/
+
+
+/***************************#4**************************/
+i have some doubts on the Thread Safeness of some classes 
+do more test on some of them to ensure they are thread safe or secure enought 
+so to ensure multiple thread do not cause deadlocks/race/unexpected results. 
+/***************************#4**************************/
+
+/***************************#5**************************/
+confirm the immutability of classes
+
+/***************************#6**************************/
+add better UI (if any at all) 
+
+/***************************#7**************************/
+add or create a Access control module or methodology as part of this solution. 
+
+/****************************8******************************/
+enhance time stamping and use a internet or CA provided one. 
