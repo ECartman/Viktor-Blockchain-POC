@@ -1,5 +1,4 @@
 /*
- *
  *   Copyright © 2019 Eduardo Vindas Cordoba. All rights reserved.
  *
  *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -118,8 +117,7 @@ dependencies {
     implementation 'org.pushing-pixels:radiance-flamingo:2.0.1'
     implementation 'org.pushing-pixels:radiance-substance-extras:2.0.1'
     implementation 'com.github.lgooddatepicker:LGoodDatePicker:10.3.1'
-    //get me the Fing documentation g dammit
-    //now i am confused tho. i set them as test imp as i dont want my final product to have sources... 
+    
     testImplementation 'org.pushing-pixels:radiance-neon:2.0.1:sources'
     testImplementation 'org.pushing-pixels:radiance-substance:2.0.1:sources'
     testImplementation 'org.pushing-pixels:radiance-photon:2.0.1:sources'
@@ -140,7 +138,7 @@ dependencies {
 // https://mvnrepository.com/artifact/org.checkerframework/checker-qual
     //**** null anotator 
     implementation group: 'org.checkerframework', name: 'checker-qual', version: '2.8.2'
-    //**** testing engine. 
+    //**** test engine. 
     testImplementation 'junit:junit:4.12'
 }
 //TODO 
