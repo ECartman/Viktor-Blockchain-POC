@@ -11,20 +11,6 @@
  *   THE SOFTWARE.
  *
  */
-/**
- * gradle build script. 
- * this file is a groove script... 
- * 
- * IDE RANT (on regards of Gradle) 
- *  NETBEANS: has lower the quality of the product since migrated to APACHE. gradle support is quite lacking. 
- *  intelliJ  good, but some of the Shorcuts are not as good as Visual studio or Netbeans
- *  great gradle support tho.  
- *  eclipse slow... way too slow. but good. i quite like it. but the UI needs rework. 
- *  visual studio code.... nice but gradle support and java. well require more work. 
- *  also vs code java modules is just a copy paste code from eclipse. but lack configurations so if you get issues with it use 
- *  eclipse and then import to vs.code.   
- * 
- */
 
 apply plugin: 'java'
 apply plugin: 'application'
