@@ -13,13 +13,12 @@
 package com.aeongames.blockchain.test;
 
 import com.aeongames.blockchain.base.MerkleTree.MerkleTree2;
-import com.aeongames.blockchain.base.common.Hash;
+
 import static com.aeongames.logger.LoggingHelper.getDefaultLogger;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import com.aeongames.blockchain.base.transactions.ITransaction;
 import com.aeongames.blockchain.common.RandomTransactionCreator;
 import com.aeongames.blockchain.common.TestTransaction;
 import org.junit.After;
@@ -66,9 +65,9 @@ public class MerkleTreeTest {
         ArrayList<TestTransaction> result =creator.createrandomlist();
         MerkleTree2 tree = new MerkleTree2(result);
         tree.getRootHash();
-        tree.printTreebystructure();
-        MerkleTree2 comfirmationTreefor = tree.getComfirmationTreefor(result.get(40));
-        comfirmationTreefor.printTreebystructure();
+        tree.printTreeByStructure();
+        MerkleTree2 comfirmationTreefor = tree.getConfirmationTreeFor(result.get(40));
+        comfirmationTreefor.printTreeByStructure();
         System.out.println("after do while");
 
     }

@@ -41,6 +41,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.LookAndFeel;
@@ -58,6 +59,9 @@ import org.pushingpixels.substance.api.skin.SubstanceGraphiteGlassLookAndFeel;
 public final class ViktorUI extends javax.swing.JFrame {
 
     public static final String PROPSFILE = "/com/aeongames/blockchain/resources/Blockchainprops.properties";
+    public static final ImageIcon logo = ViktorUI.class.getResource("/com/aeongames/edi/utils/visual/resources/logoico.png") == null
+                    ? null : new javax.swing.ImageIcon(
+                            ViktorUI.class.getResource("/com/aeongames/edi/utils/visual/resources/logoico.png"));
     /**
      * person pool for the application wide use.... this thing... should be a
      * structure used... more refined. but doing this way for the sake of
@@ -119,6 +123,7 @@ public final class ViktorUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("ViktorBlockChain POC.");
+        setIconImage(logo.getImage());
         setMinimumSize(new java.awt.Dimension(800, 600));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Chain"));

@@ -1,6 +1,6 @@
-/*
+/**
  *
- *  Copyright © ï¿½ 2019 Eduardo Vindas Cordoba. All rights reserved.
+ *  Copyright © 2019 Eduardo Vindas Cordoba. All rights reserved.
  *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -48,7 +48,7 @@ public final class MerkleTree2 {
      * for transaction checking.
      *
      */
-    private final boolean partialtree;
+    private final boolean partial_tree;
 
     /**
      * this attribute will contain the Root Hash of the Tree. this value Might
@@ -66,13 +66,13 @@ public final class MerkleTree2 {
     private transient ArrayList<ArrayList<MerkleNode>> tree;
 
     public MerkleTree2(List<? extends ITransaction> Transactions) {//TODO: this needs to be a generic of type or that inherits a Transaction Object and not Object
-        partialtree = false;
+        partial_tree = false;
         Leafs = new ArrayList<>(Objects.requireNonNull(Transactions, "the Transaction List is Null").size());
         Transactions.forEach(Transaction -> Leafs.add(new MerkleNode(Transaction)));
     }
 
     private MerkleTree2(MerkleNode theConfirmationNode) {
-        partialtree = true;
+        partial_tree = true;
         Leafs = new ArrayList<>(2);
         MerkleNode clonedtree = theConfirmationNode.getTraceNodesOnly();
         RootHash = clonedtree.getRoot();
@@ -88,16 +88,16 @@ public final class MerkleTree2 {
      * @return a {@code}Hash that contains and represent the rootHash.
      */
     public Hash getRootHash() {
-        if (RootHash == null && !partialtree) {
+        if (RootHash == null && !partial_tree) {
             CalculateRootHash();
-        } else if (RootHash == null && partialtree) {
+        } else if (RootHash == null && partial_tree) {
             throw new NullPointerException("this is a Partial Tree With no Root");
         }
         return RootHash.getID();
     }
 
     /**
-     * in some cases we dont need more than just the nodes and the root. so we
+     * in some cases we don't need more than just the nodes and the root. so we
      * will allow the tree removal. tho please have in mind that is cheaper to
      * have more memory than processing power to calculate the hashes.
      */
@@ -106,7 +106,12 @@ public final class MerkleTree2 {
         tree = null;
     }
 
-    public MerkleTree2 getComfirmationTreefor(ITransaction Transaction) {
+    /**
+     *  build and returns a Confirmation Merkle Tree for a Given Transaction.
+     * @param Transaction a transaction to be confirmed and we require a partial Tree.
+     * @return a Partial Merkle Tree
+     */
+    public MerkleTree2 getConfirmationTreeFor(ITransaction Transaction) {
         int indexofnode = Leafs.indexOf(new MerkleNode(Transaction));
         if (indexofnode >= 0) {
             return buildConfirmationTree(indexofnode);
@@ -144,13 +149,13 @@ public final class MerkleTree2 {
         for (int index = 1; index < expectedsize; index++) {
             ArrayList<MerkleNode> source = tree.get(index - 1);
             //the size it will need to store the nodes
-            int levelnodes = (int) Math.ceil(((double) source.size()) / 2d);
-            ArrayList<MerkleNode> level = new ArrayList<>(levelnodes);
+            int levelNodes = (int) Math.ceil(((double) source.size()) / 2d);
+            ArrayList<MerkleNode> level = new ArrayList<>(levelNodes);
             for (int filler = 0; filler < source.size(); filler += 2) {
                 //so we will get a error of the thing is not a perfect half. how to solve? 
                 if (filler + 1 == source.size()) {
                     level.add(new MerkleNode(source.get(filler), source.get(filler)));
-                    //WE ARE MUTATED! maybe we should notify someone bitcoin does althought is ignored for the most part... 
+                    //WE ARE MUTATED! maybe we should notify someone?
                 } else {
                     level.add(new MerkleNode(source.get(filler), source.get(filler + 1)));
                 }
@@ -163,7 +168,7 @@ public final class MerkleTree2 {
     /**
      * TODO: remove or edit. as this is currently for testing.
      */
-    public void printTreebystructure() {
+    public void printTreeByStructure() {
         if (RootHash != null) {
             for (int index = 0; index <= RootHash.getMerkleHeight(); index++) {
                 System.out.print("Level " + index + " ");
@@ -172,20 +177,6 @@ public final class MerkleTree2 {
                 });
                 System.out.println();
             }
-        }
-    }
-
-    /**
-     * TODO: remove or edit. as this is currently for testing.
-     */
-    public void printTreebylevels() {
-        if (tree != null) {
-            tree.forEach(level -> {
-                level.forEach(Node -> {
-                    System.out.print(Node.getID().toString() + "  ||  ");
-                });
-                System.out.println();
-            });
         }
     }
 
@@ -199,9 +190,22 @@ public final class MerkleTree2 {
      * incomplete.
      */
     public boolean isPartialTree() {
-        return partialtree;
+        return partial_tree;
     }
 
+    /**
+     * check if this object represent the same reference as other Tree.
+     * if is not the same reference it will test whenever or not this tree
+     * and the other tree Merkle Tree root matches (this however requires that
+     * both Tree Merkle root is defined. )
+     * if the roots are not defined it will iterate and look into the items on this
+     * Merkle tree and do a ArrayList.equals
+     *
+     * {@inheritDoc}
+     *
+     * @param other
+     * @return
+     */
     @Override
     public boolean equals(Object other) {
         if (Objects.nonNull(other)) {
@@ -223,11 +227,17 @@ public final class MerkleTree2 {
     }
 
     /**
-     * please avoid for security reasons this is only used for JAVA usage please
-     * read the hash instead!
+     * This Method is NOT intended for our consumption, but rather for usage on JAVA internal
+     * functions such as those used on Hashmap or hashtable. or whatever else uses the java
+     * hashCode.
+     * for our needs we will use others methods therefore AVOID USING THIS METHOD unless you
+     * REALLY need to (ie. adding into a JAVA bucket structure)
      *
      * please avoid using this method is here so it can be used by java internal methods.
      * @return 32 bit JAVA! hash PLEASE AVOID
+     *
+     *
+     * {@inheritDoc}
      */
     @Override
     public int hashCode() {
