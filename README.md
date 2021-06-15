@@ -6,7 +6,7 @@ a Java based Blockchain Proof of concept that uses PBFT for consensus this initi
 
 and currently require more work for a more general or usable approach to be run on a distributed network. 
 
-the PBFT algorithm used ca ben found here: 
+the PBFT algorithm used can be found here: 
 https://github.com/AgentTroll/pbft-java
 
 TODO: update and add open source license... 
