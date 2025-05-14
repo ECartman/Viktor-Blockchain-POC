@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright © 2008-2012 Eduardo Vindas Cordoba. All rights reserved.
+ * Copyright © 2010-2024 Eduardo Vindas Cordoba. All rights reserved.
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -17,13 +17,15 @@
  */
 package com.aeongames.edi.utils.text;
 
+import java.awt.Component;
 import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.JLabel;
 
 /**
  *
- * @author Eduardo Vindas C <eduardo.vindas@hp.com>
- * @version 1.5
+ * @author Eduardo Vindas C
+ * @version 1.8
  */
 public class LabelText {
 
@@ -38,12 +40,12 @@ public class LabelText {
      * text wrap!!</strong><br> this implementation <strong>is not Thread
      * Safe!</strong>
      *
-     * @param JLable label, the label to add the text into
-     * @param String text, the text to be added or to be contained on the label
+     * @param label, the label to add the text into
+     * @param text, the text to be added or to be contained on the label
      * this object will not be edited or changed.
      */
     public static void wrapLabelText(final JLabel label, final String text) {
-        final String finalstring = getTrimmedtolabelsize(text, label);
+        final String finalstring = getTrimmedtoComponentsize(text, label);
         if (EventQueue.isDispatchThread()) {
             label.setText(finalstring);
         } else {
@@ -52,11 +54,8 @@ public class LabelText {
              * will allow for now as there are many clases that might expect
              * help to call AWT
              */
-            java.awt.EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    label.setText(finalstring);
-                }
+            java.awt.EventQueue.invokeLater(() -> {
+                label.setText(finalstring);
             });
         }
     }
@@ -77,31 +76,23 @@ public class LabelText {
      * @param text
      */
     public static void SyncwrapLabelText(final JLabel label, final String text) {
-        final String finalstring = getTrimmedtolabelsize(text, label);
+        final String finalstring = getTrimmedtoComponentsize(text, label);
         if (EventQueue.isDispatchThread()) {
             label.setText(finalstring);
         } else {
             try {
-                java.awt.EventQueue.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        label.setText(finalstring);
-                    }
+                java.awt.EventQueue.invokeAndWait(() -> {
+                    label.setText(finalstring);
                 });
-            } catch (Exception ex) {
-                java.awt.EventQueue.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        label.setText(finalstring);
-                    }
+            } catch (InterruptedException | InvocationTargetException ex) {
+                java.awt.EventQueue.invokeLater(() -> {
+                    label.setText(finalstring);
                 });
             }
         }
     }
     
-    private static int threadInitNumber;
-
-    private static final String Filler="...";
+    private static final String FILLER_TEXT="...";
     /**
      * this method will compute the amount of text that the provided label is
      * able to fit and display. and will return a string trimmed to the size of
@@ -109,19 +100,19 @@ public class LabelText {
      * provided.
      *
      * @param data the string data that will be computer if is possible to fit.
-     * @param label the label that will display the data.
+     * @param UIComponent the label that will display the data.
      * @return String that will contain a trimmed string with the possible data
      * displayable if the string is too long will also calculate space to add
      * &quot;...&quot;
      */
-    public static String getTrimmedtolabelsize(final String data, final JLabel label) {
-        if (data != null && label != null) {
-            java.awt.FontMetrics fm = label.getFontMetrics(label.getFont());
-            int containerWidth = label.getWidth();
+    public static String getTrimmedtoComponentsize(final String data, final Component UIComponent) {
+        if (data != null && UIComponent != null) {
+            java.awt.FontMetrics fm = UIComponent.getFontMetrics(UIComponent.getFont());
+            int containerWidth = UIComponent.getWidth();
             StringBuilder trial = new StringBuilder();
             StringBuilder real = new StringBuilder();
             if (!data.trim().equals("")) {
-                int limit = (containerWidth - javax.swing.SwingUtilities.computeStringWidth(fm, Filler));
+                int limit = (containerWidth - javax.swing.SwingUtilities.computeStringWidth(fm, FILLER_TEXT));
                 for (int location = 0; location < data.length(); location++) {
                     char letter = data.charAt(location);
                     trial.append(letter);
@@ -136,15 +127,13 @@ public class LabelText {
                                 real.deleteCharAt(real.length() - 1);
                             }
                         }
-                        real.append(Filler);
+                        real.append(FILLER_TEXT);
                         break;
                     }
                     real.append(letter);
                 }
             }
             trial.delete(0, trial.length());
-            trial = null;
-            fm = null;
             return real.toString();
         } else {
             throw new NullPointerException("Null values are not allowed!");
